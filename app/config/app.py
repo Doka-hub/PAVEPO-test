@@ -3,7 +3,7 @@ from typing import List, Optional
 
 from fastapi import FastAPI, Depends
 
-from app.config import get_settings, Settings
+from app.config.settings import get_settings, Settings
 
 
 def create_app(
@@ -13,7 +13,7 @@ def create_app(
     if settings is None:
         settings = get_settings()
 
-    from app.database import create_tables, get_db_session, get_engine
+    from app.config.database import create_tables, get_db_session, get_engine
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
