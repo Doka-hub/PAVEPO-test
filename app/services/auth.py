@@ -2,13 +2,14 @@ from datetime import datetime, timedelta
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security.http import HTTPBearer, HTTPAuthorizationCredentials
-
 from jose import jwt, JWTError
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app import crud
+from app import crud, schemas
 from app.config.database import get_db_session
 from app.config.settings import get_settings
+from app.models.users import User
 
 bearer_scheme = HTTPBearer()
 
@@ -37,7 +38,11 @@ async def get_current_user(
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(token.credentials, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        payload = jwt.decode(
+            token.credentials,
+            settings.SECRET_KEY,
+            algorithms=[settings.ALGORITHM]
+        )
         user_id: str = payload.get("sub")
         if user_id is None:
             raise credentials_exception
@@ -47,3 +52,21 @@ async def get_current_user(
     if user is None:
         raise credentials_exception
     return user
+
+
+async def update_user(db: AsyncSession, user_id: int, data: schemas.UserUpdate):
+    result = await db.execute(select(User).where(User.id == user_id))
+    user = result.scalars().first()
+    if user:
+        for key, value in data.dict(exclude_unset=True).items():
+            setattr(user, key, value)
+        await db.commit()
+    return user
+
+
+async def delete_user(db: AsyncSession, user_id: int):
+    result = await db.execute(select(User).where(User.id == user_id))
+    user = result.scalars().first()
+    if user:
+        await db.delete(user)
+        await db.commit()
