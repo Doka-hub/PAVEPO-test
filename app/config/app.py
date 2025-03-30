@@ -38,7 +38,8 @@ def create_app(
         redoc_url=f"/api/v1/redoc",
     )
 
-    from app.api import auth, users
+    from app.api import auth, users, audios
     app.include_router(auth.router, prefix="/api/v1")
     app.include_router(users.router, prefix="/api/v1")
+    app.include_router(audios.router, prefix="/api/v1")
     return app
