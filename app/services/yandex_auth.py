@@ -1,4 +1,5 @@
 import httpx
+from fastapi.exceptions import HTTPException
 
 from app.config.settings import get_settings
 
@@ -20,9 +21,23 @@ async def exchange_code_for_user_info(code: str):
     }
     async with httpx.AsyncClient() as client:
         token_response = await client.post(token_url, data=data)
-        token_data = token_response.json()
+        try:
+            token_data = token_response.json()
+        except Exception:
+            raise HTTPException(status_code=500, detail="Ошибка получения данных токена")
+
         access_token = token_data.get("access_token")
+        if not access_token:
+            raise HTTPException(status_code=400, detail="Не удалось получить access_token")
+
         user_info_url = "https://login.yandex.ru/info"
         headers = {"Authorization": f"OAuth {access_token}"}
         user_info_response = await client.get(user_info_url, headers=headers)
-        return user_info_response.json()
+
+        try:
+            return user_info_response.json()
+        except Exception:
+            raise HTTPException(
+                status_code=500,
+                detail="Ошибка получения информации о пользователе"
+            )
