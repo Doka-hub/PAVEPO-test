@@ -28,7 +28,3 @@
 ```bash
 docker compose up --build -d
 ```
-4. Запуск тестов
-```bash
-docker compose run -rm tests
-```
