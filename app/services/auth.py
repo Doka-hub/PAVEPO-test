@@ -1,7 +1,8 @@
 from datetime import datetime, timedelta
 
 from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security.http import HTTPBearer, HTTPAuthorizationCredentials
+
 from jose import jwt, JWTError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -9,7 +10,7 @@ from app import crud
 from app.config.database import get_db_session
 from app.config.settings import get_settings
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+bearer_scheme = HTTPBearer()
 
 
 def create_access_token(data: dict, expires_delta: timedelta = None):
@@ -25,7 +26,7 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
 
 
 async def get_current_user(
-    token: str = Depends(oauth2_scheme),
+    token: HTTPAuthorizationCredentials = Depends(bearer_scheme),
     db: AsyncSession = Depends(get_db_session),
 ):
     settings = get_settings()
@@ -36,7 +37,7 @@ async def get_current_user(
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        payload = jwt.decode(token.credentials, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         user_id: str = payload.get("sub")
         if user_id is None:
             raise credentials_exception
