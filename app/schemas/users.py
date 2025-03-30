@@ -9,7 +9,7 @@ class User(BaseModel):
     is_superuser: bool
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class UserUpdate(BaseModel):

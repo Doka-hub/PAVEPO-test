@@ -5,7 +5,6 @@ class Audio(BaseModel):
     id: int
     file_name: str
     file_path: str
-    owner_id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
