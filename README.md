@@ -34,5 +34,5 @@ docker compose up --build -d
 ```bash 
 ngrok http 8000
 ```
-Ссылку нужно вставить в приложение яндекса в качестве callback url и добавить в `.env` переменную `YANDEX_REDIRECT_URI` с этой ссылкой.
+Ссылку нужно вставить в приложение яндекса в качестве callback url.
 URL для авторизации: `https://url_from_ngrok/api/v1/auth/yandex`
