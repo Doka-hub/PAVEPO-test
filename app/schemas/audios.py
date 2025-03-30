@@ -6,3 +6,6 @@ class Audio(BaseModel):
     file_name: str
     file_path: str
     owner_id: int
+
+    class Config:
+        orm_mode = True
