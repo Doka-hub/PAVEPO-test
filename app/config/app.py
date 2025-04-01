@@ -30,7 +30,7 @@ def create_app(
         dependencies = [Depends(get_db_session)]
 
     app = FastAPI(
-        title="Tron Address Analyzer",
+        title="Pavepo Test",
         lifespan=lifespan,
         dependencies=dependencies,
         openapi_url=f"/api/v1/openapi.json",
